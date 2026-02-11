@@ -1,7 +1,7 @@
-import { ApiResponse, login } from "@/services/api/apiClient";
+import { ApiResponse, registerUser } from "@/services/api/apiClient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     Alert,
     Pressable,
@@ -12,21 +12,17 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function HomeScreen() {
+export default function TabTwoScreen() {
     const [textInput, setTextInput] = useState({
+        first_name: "",
+        last_name: "",
         email: "",
         password: "",
     });
 
-    useEffect(() => {
-        async () => {
-            const user = await AsyncStorage.getItem("auth-user");
-        };
-    }, []);
-
-    const handleLogin = async () => {
+    const handleRegister = async () => {
         try {
-            const response = await login(textInput);
+            const response = await registerUser(textInput);
             if (response.success) {
                 await AsyncStorage.setItem(
                     "auth-user",
@@ -50,7 +46,43 @@ export default function HomeScreen() {
         <SafeAreaView style={styles.pageContainer}>
             <View style={styles.formWrapper}>
                 <View style={styles.loginForm}>
-                    <Text style={styles.pageTitle}>Login</Text>
+                    <Text style={styles.pageTitle}>Register</Text>
+                    <View
+                        style={{
+                            position: "relative",
+                            height: 34,
+                        }}
+                    >
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="First Name"
+                            onChangeText={(text) =>
+                                setTextInput((prev) => ({
+                                    ...prev,
+                                    first_name: text,
+                                }))
+                            }
+                        />
+                        <View style={styles.inputShadow}></View>
+                    </View>
+                    <View
+                        style={{
+                            position: "relative",
+                            height: 34,
+                        }}
+                    >
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Last Name"
+                            onChangeText={(text) =>
+                                setTextInput((prev) => ({
+                                    ...prev,
+                                    last_name: text,
+                                }))
+                            }
+                        />
+                        <View style={styles.inputShadow}></View>
+                    </View>
                     <View
                         style={{
                             position: "relative",
@@ -66,8 +98,8 @@ export default function HomeScreen() {
                                     email: text,
                                 }))
                             }
-                            autoCapitalize="none"
                             keyboardType="email-address"
+                            autoCapitalize="none"
                         />
                         <View style={styles.inputShadow}></View>
                     </View>
@@ -86,15 +118,15 @@ export default function HomeScreen() {
                                     password: text,
                                 }))
                             }
+                            secureTextEntry={true}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            secureTextEntry={true}
                         />
                         <View style={styles.inputShadow}></View>
                     </View>
-                    <Pressable style={styles.loginBtn} onPress={handleLogin}>
+                    <Pressable style={styles.loginBtn} onPress={handleRegister}>
                         <Text style={{ color: "white", fontSize: 16 }}>
-                            Login
+                            Register
                         </Text>
                     </Pressable>
                 </View>
