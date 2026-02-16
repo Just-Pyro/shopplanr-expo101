@@ -7,12 +7,27 @@ import { Stack } from "expo-router";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { runSync } from "@/services/sync/SyncService";
+import NetInfo from "@react-native-community/netinfo";
+import { useEffect } from "react";
 
 export const unstable_settings = {
     anchor: "(tabs)",
 };
 
 export default function RootLayout() {
+    useEffect(() => {
+        runSync();
+
+        const unsub = NetInfo.addEventListener((state) => {
+            if (state.isConnected) {
+                runSync();
+            }
+        });
+
+        return () => unsub();
+    }, []);
+
     const colorScheme = useColorScheme();
 
     return (

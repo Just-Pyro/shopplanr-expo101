@@ -1,8 +1,15 @@
-import { ApiResponse, login } from "@/services/api/apiClient";
+import {
+    ApiResponse,
+    testApi as ApiTest,
+    login,
+} from "@/services/api/apiClient";
+import { resetDB, showData } from "@/services/database/database";
+import { runSync } from "@/services/sync/SyncService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     Pressable,
     StyleSheet,
@@ -17,6 +24,7 @@ export default function HomeScreen() {
         email: "",
         password: "",
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         async () => {
@@ -26,6 +34,7 @@ export default function HomeScreen() {
 
     const handleLogin = async () => {
         try {
+            setIsLoading(true);
             const response = await login(textInput);
             if (response.success) {
                 await AsyncStorage.setItem(
@@ -43,6 +52,55 @@ export default function HomeScreen() {
             } else {
                 Alert.alert("Login Failed", data?.message);
             }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleReset = async () => {
+        try {
+            const result = await resetDB();
+        } catch (error: any) {
+            console.error("error", error);
+        }
+    };
+
+    const showDB = async () => {
+        try {
+            const result = await showData();
+            // console.log("type:", typeof result);
+            // console.log("po:", result);
+            console.log("test");
+            console.log("result", result);
+            if (typeof result == "object") {
+                result.forEach((item: any) => {
+                    console.log(item);
+                });
+                // for (const [key, value] of Object.entries(result)) {
+                //     console.log(`${key}: ${value}`);
+                // }
+            } else {
+                console.log("empty", result);
+            }
+        } catch (error: any) {
+            console.error("error", error);
+        }
+    };
+
+    const syncOperation = async () => {
+        try {
+            await runSync();
+        } catch (error: any) {
+            console.error("error", error);
+        }
+    };
+
+    const testApi = async () => {
+        try {
+            const result = await ApiTest();
+            console.log("test api: ", result.message);
+        } catch (error: any) {
+            console.error("error", error);
         }
     };
 
@@ -93,13 +151,35 @@ export default function HomeScreen() {
                         <View style={styles.inputShadow}></View>
                     </View>
                     <Pressable style={styles.loginBtn} onPress={handleLogin}>
-                        <Text style={{ color: "white", fontSize: 16 }}>
-                            Login
-                        </Text>
+                        {isLoading ? (
+                            <ActivityIndicator color={"white"} />
+                        ) : (
+                            <Text style={{ color: "white", fontSize: 16 }}>
+                                Login
+                            </Text>
+                        )}
                     </Pressable>
                 </View>
                 <View style={styles.formShadow}></View>
             </View>
+            <Pressable
+                style={{ borderWidth: 1, padding: 5, marginTop: 20 }}
+                onPress={handleReset}
+            >
+                <Text>Reset</Text>
+            </Pressable>
+            <Pressable style={{ borderWidth: 1, padding: 5 }} onPress={showDB}>
+                <Text>Show Pending</Text>
+            </Pressable>
+            {/* <Pressable
+                style={{ borderWidth: 1, padding: 5 }}
+                onPress={syncOperation}
+            >
+                <Text>Sync Online</Text>
+            </Pressable>
+            <Pressable style={{ borderWidth: 1, padding: 5 }} onPress={testApi}>
+                <Text>test api</Text>
+            </Pressable> */}
         </SafeAreaView>
     );
 }

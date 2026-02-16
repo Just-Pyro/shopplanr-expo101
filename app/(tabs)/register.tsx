@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     Pressable,
     StyleSheet,
@@ -19,9 +20,11 @@ export default function TabTwoScreen() {
         email: "",
         password: "",
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleRegister = async () => {
         try {
+            setIsLoading(true);
             const response = await registerUser(textInput);
             if (response.success) {
                 await AsyncStorage.setItem(
@@ -39,6 +42,8 @@ export default function TabTwoScreen() {
             } else {
                 Alert.alert("Login Failed", data?.message);
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -125,9 +130,13 @@ export default function TabTwoScreen() {
                         <View style={styles.inputShadow}></View>
                     </View>
                     <Pressable style={styles.loginBtn} onPress={handleRegister}>
-                        <Text style={{ color: "white", fontSize: 16 }}>
-                            Register
-                        </Text>
+                        {isLoading ? (
+                            <ActivityIndicator color={"white"} />
+                        ) : (
+                            <Text style={{ color: "white", fontSize: 16 }}>
+                                Register
+                            </Text>
+                        )}
                     </Pressable>
                 </View>
                 <View style={styles.formShadow}></View>

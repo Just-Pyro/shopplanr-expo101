@@ -1,11 +1,14 @@
 import { createShopPlan } from "@/services/database/database";
+import { runSync } from "@/services/sync/SyncService";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import NetInfo from "@react-native-community/netinfo";
 import * as Crypto from "expo-crypto";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     FlatList,
     Pressable,
@@ -53,6 +56,7 @@ export default function create() {
     });
     const [productItems, setProductItems] = useState<Item[]>([]);
     const [showSave, setShowSave] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     // const [date, setDate] = useState<Date>(new Date());
 
     const onChange = (event: any, selectedDate?: Date) => {
@@ -127,6 +131,7 @@ export default function create() {
 
     const handleCreate = async () => {
         try {
+            setIsLoading(true);
             const authUser = await AsyncStorage.getItem("auth-user");
             if (authUser) {
                 const user = JSON.parse(authUser);
@@ -157,6 +162,11 @@ export default function create() {
                 const result = await createShopPlan(shopPlan);
 
                 if (result) {
+                    const netState = await NetInfo.fetch();
+                    if (netState.isConnected) {
+                        await runSync();
+                    }
+
                     router.back();
                 }
             }
@@ -165,6 +175,8 @@ export default function create() {
                 error instanceof Error ? error.message : "Something went wrong";
 
             Alert.alert("Error", message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -375,7 +387,11 @@ export default function create() {
                         ]}
                         onPress={handleCreate}
                     >
-                        <Text style={{ color: "white" }}>Create Plan</Text>
+                        {isLoading ? (
+                            <ActivityIndicator color={"white"} />
+                        ) : (
+                            <Text style={{ color: "white" }}>Create Plan</Text>
+                        )}
                     </Pressable>
                 )}
             </View>

@@ -1,9 +1,12 @@
+import { updateOverdue } from "@/services/api/apiClient";
 import {
     shopPlanList as getPlanList,
     initDB,
     ShopPlan,
 } from "@/services/database/database";
+import { runSync } from "@/services/sync/SyncService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
 import { useIsFocused } from "@react-navigation/native";
 import { Link, router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -22,6 +25,7 @@ type ShopPlanList = {
 export default function list() {
     const isFocus = useIsFocused();
     const [spList, setSpList] = useState<ShopPlan[]>([]);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -46,9 +50,17 @@ export default function list() {
 
                 if (result.length > 0) {
                     setSpList(result);
+
+                    const netState = await NetInfo.fetch();
+                    if (netState.isConnected) {
+                        runSync();
+                    }
                 } else {
                     setSpList([]);
                 }
+
+                const uod = await updateOverdue(user.id);
+                console.log("uod:", uod);
             }
         } catch (error) {
             console.error("error", error);
@@ -112,6 +124,14 @@ export default function list() {
         );
     };
 
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        console.log("list refreshing");
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 5000);
+    };
+
     return (
         <SafeAreaView style={styles.pageContainer}>
             <View style={styles.headerContainer}>
@@ -144,6 +164,8 @@ export default function list() {
                     keyExtractor={(item) =>
                         item.id?.toString() ?? "fallback-key"
                     }
+                    onRefresh={handleRefresh}
+                    refreshing={isRefreshing}
                 />
                 <Pressable
                     style={({ pressed }) => [

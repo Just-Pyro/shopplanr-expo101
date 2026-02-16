@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "http://10.10.1.102:8005/api";
+// const BASE_URL = "http://10.10.1.102:8005/api";
+const BASE_URL = "https://tenantlike-adriel-unmonistic.ngrok-free.dev/api";
 
 export interface ApiResponse<T = unknown> {
     success: boolean;
@@ -68,12 +69,30 @@ export interface ShopPlanItem {
 export interface ShopPlanStatus {
     id: number;
     status: number;
+    items: any;
 }
 
 export interface ShopPlanUpdate {
     status: number;
-    items: ItemFields[];
+    budget: number;
+    items: ItemPlanUpdate[];
 }
+
+interface ItemPlanUpdate {
+    name: string;
+    price: number;
+    actual_quantity: number;
+}
+
+interface TestApi {
+    message: string;
+}
+
+export const testApi = async (): Promise<ApiResponse<TestApi>> => {
+    const url = `${BASE_URL}/test`;
+    const response = await axios.get<ApiResponse<TestApi>>(url);
+    return response.data;
+};
 
 export const login = async (
     loginCreds: loginCreds,
@@ -107,6 +126,16 @@ export const createShopPlan = async (
     return response.data;
 };
 
+export const insertItems = async (
+    items: ShopPlanItem[],
+): Promise<ApiResponse<Omit<ShopPlanItem, "actual_quantity">>> => {
+    const url = `${BASE_URL}/items`;
+    const response = await axios.post<
+        ApiResponse<Omit<ShopPlanItem, "actual_quantity">>
+    >(url, items);
+    return response.data;
+};
+
 export const showShopPlan = async (
     shopId: number,
 ): Promise<ApiResponse<ShopPlan>> => {
@@ -124,5 +153,23 @@ export const updateShopPlan = async (
         url,
         shopPlan,
     );
+
+    console.log("update api: ", response.data);
+    return response.data;
+};
+
+export const startShopPlan = async (
+    server_id: number,
+): Promise<ApiResponse<boolean>> => {
+    const url = `${BASE_URL}/shop_plans/start/${server_id}`;
+    const response = await axios.put<ApiResponse<boolean>>(url);
+    return response.data;
+};
+
+export const updateOverdue = async (
+    userId: number,
+): Promise<ApiResponse<boolean>> => {
+    const url = `${BASE_URL}/shop_plans/overdue/${userId}`;
+    const response = await axios.put<ApiResponse<boolean>>(url);
     return response.data;
 };

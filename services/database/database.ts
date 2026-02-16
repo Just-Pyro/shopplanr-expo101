@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
 import { validateShopPlanCreate, validateUpdateShopPlan } from "./validator";
 
-let dbPromise = SQLite.openDatabaseAsync("shopplanr.db");
+export let dbPromise = SQLite.openDatabaseAsync("shopplanr.db");
 
 // export interface ShopPlanList {
 //     id: number;
@@ -95,6 +95,7 @@ interface ShowShopPlan {
 
 interface UpdateItem {
     id: number;
+    name: string;
     price: number;
     actual_quantity: number;
 }
@@ -102,6 +103,7 @@ interface UpdateItem {
 export interface UpdateShopPlan {
     shop_plan_id: number;
     status: number;
+    budget: number;
     items: UpdateItem[];
 }
 
@@ -122,6 +124,7 @@ export const initDB = async () => {
 
         CREATE TABLE IF NOT EXISTS shop_plans (
             id INTEGER PRIMARY KEY NOT NULL,
+            server_id INTEGER,
             created_by INTEGER,
             address TEXT,
             date_scheduled TEXT, 
@@ -135,6 +138,7 @@ export const initDB = async () => {
 
         CREATE TABLE IF NOT EXISTS items (
             id INTEGER PRIMARY KEY NOT NULL,
+            server_id INTEGER,
             shop_plan_id INTEGER,
             name TEXT,
             price REAL,
@@ -158,7 +162,7 @@ export const initDB = async () => {
     `);
 };
 
-export const showData = async (userId: number): Promise<any> => {
+export const showData = async (): Promise<any> => {
     try {
         const db = await dbPromise;
 
@@ -168,35 +172,62 @@ export const showData = async (userId: number): Promise<any> => {
         // );
 
         // return rowsToUpdate;
-        return await db.getAllAsync(`SELECT date_scheduled FROM shop_plans`);
+        return await db.getAllAsync(`SELECT * FROM pending_operations`);
+        // return await db.getAllAsync(`SELECT * FROM shop_plans`);
     } catch (error) {
         console.error("error:", error);
     }
+};
+
+export const resetDB = async () => {
+    const db = await dbPromise;
+
+    await db.execAsync(`
+        DROP TABLE IF EXISTS pending_operations;
+        DROP TABLE IF EXISTS items;
+        DROP TABLE IF EXISTS shop_plans;
+        DROP TABLE IF EXISTS users;
+    `);
 };
 
 export const shopPlanList = async (userId: number): Promise<ShopPlan[]> => {
     try {
         const db = await dbPromise;
 
-        const rowsToUpdate: { id: number }[] = await db.getAllAsync(
-            `SELECT id FROM shop_plans WHERE created_by = ? AND status IN (0,1) AND date_scheduled < datetime('now', 'start of day')`,
-            userId,
-        );
+        const rowsToUpdate: { id: number; server_id: number }[] =
+            await db.getAllAsync(
+                `SELECT id, server_id FROM shop_plans WHERE created_by = ? AND status IN (0,1) AND date_scheduled < datetime('now', 'start of day')`,
+                userId,
+            );
 
-        await db.runAsync(
-            `UPDATE shop_plans SET status = 3, updated_at = CURRENT_TIMESTAMP WHERE id IN (${rowsToUpdate.map(() => "?").join(",")})`,
-            rowsToUpdate.map((r) => r.id),
-        );
+        if (rowsToUpdate.length > 0) {
+            await db.runAsync(
+                `UPDATE shop_plans SET status = 3, updated_at = CURRENT_TIMESTAMP WHERE id IN (${rowsToUpdate.map(() => "?").join(",")})`,
+                rowsToUpdate.map((r) => r.id),
+            );
 
-        const now = new Date().toISOString();
-        const pending_operations = {
-            entity_type: "shop_plans",
-            entity_id: "0",
-            operation_type: "update",
-            payload: JSON.stringify({ status: 3, updated_at: now }),
-        };
+            // let payload: { status: number; server_id: number | null } = {
+            //     status: 3,
+            //     server_id: null,
+            // };
 
-        await insertPendingOperation(pending_operations, rowsToUpdate);
+            // for (const rows of rowsToUpdate) {
+            //     payload = {
+            //         ...payload,
+            //         server_id: rows.server_id,
+            //     };
+            //     const pending_operations = {
+            //         entity_type: "shop_plans",
+            //         entity_id: rows.server_id
+            //             ? rows.server_id.toString()
+            //             : "null",
+            //         operation_type: "start",
+            //         payload: JSON.stringify(payload),
+            //     };
+
+            //     await insertPendingOperation(pending_operations, []);
+            // }
+        }
 
         return await db.getAllAsync(
             `SELECT id, address, date_scheduled, budget, number_of_items, status FROM shop_plans WHERE created_by = ? ORDER BY created_at DESC`,
@@ -209,19 +240,22 @@ export const shopPlanList = async (userId: number): Promise<ShopPlan[]> => {
 };
 
 export const insertPendingOperation = async (
-    { entity_type, entity_id = "0", operation_type, payload }: PendingOperation,
+    { entity_type, entity_id, operation_type, payload }: PendingOperation,
     rowsToUpdate: { id: number }[],
 ) => {
     try {
         const db = await dbPromise;
 
-        if (entity_id === "0") {
+        // console.log("entity_id:", entity_id, "entity_type:", entity_type);
+        // console.log("rowsToUpdate:", rowsToUpdate);
+        if (entity_id != "0") {
             await db.runAsync(
                 `INSERT INTO pending_operations (entity_type, entity_id, operation_type, payload) VALUES(?,?,?,?)`,
                 [entity_type, entity_id, operation_type, payload],
             );
         } else {
             for (const row of rowsToUpdate) {
+                // console.log("rowid: ", row.id);
                 await db.runAsync(
                     `INSERT INTO pending_operations (entity_type, entity_id, operation_type, payload) VALUES(?,?,?,?)`,
                     [entity_type, row.id, operation_type, payload],
@@ -271,24 +305,25 @@ export const createShopPlan = async ({
         if (!result.lastInsertRowId)
             throw new Error("Shop Plan Creation Failed");
 
-        const operation_shop_plan = {
-            entity_type: "shop_plans",
-            entity_id: result.lastInsertRowId.toString(),
-            operation_type: "insert",
-            payload: JSON.stringify({
-                created_by: created_by,
-                address: address,
-                date_scheduled: date_scheduled,
-                budget: budget,
-                number_of_items: number_of_items,
-                status: status,
-            }),
-        };
-        await insertPendingOperation(operation_shop_plan, []);
+        // const operation_shop_plan = {
+        //     entity_type: "shop_plans",
+        //     entity_id: result.lastInsertRowId.toString(),
+        //     operation_type: "insert",
+        //     payload: JSON.stringify({
+        //         created_by: created_by,
+        //         address: address,
+        //         date_scheduled: date_scheduled,
+        //         budget: budget,
+        //         number_of_items: number_of_items,
+        //         status: status,
+        //     }),
+        // };
+        // await insertPendingOperation(operation_shop_plan, []);
 
         let query = `INSERT INTO items (shop_plan_id, name, price, expected_quantity, actual_quantity) VALUES`;
         let values: any[] = [];
         let placeholders: string[] = [];
+        let payload: Omit<ItemType, "id">[] = [];
         items.forEach((item) => {
             placeholders.push("(?,?,?,?,?)");
             values.push(
@@ -298,6 +333,13 @@ export const createShopPlan = async ({
                 item.expected_quantity,
                 item.actual_quantity,
             );
+            payload.push({
+                shop_plan_id: result.lastInsertRowId,
+                name: item.name,
+                price: item.price,
+                expected_quantity: item.expected_quantity,
+                actual_quantity: item.actual_quantity,
+            });
         });
 
         query += placeholders.join(",");
@@ -312,9 +354,19 @@ export const createShopPlan = async ({
             result.lastInsertRowId,
         );
 
-        const operation_items = {
-            entity_type: "items",
-            entity_id: "0",
+        // console.log("values: ", values);
+        if (rowsToUpdate.length > 0) {
+            rowsToUpdate.forEach((item: any) => {
+                payload = payload.map((obj) => ({
+                    ...obj,
+                    id: item.id,
+                }));
+            });
+        }
+
+        const operation_shop_plan = {
+            entity_type: "shop_plans",
+            entity_id: result.lastInsertRowId.toString(),
             operation_type: "insert",
             payload: JSON.stringify({
                 created_by: created_by,
@@ -323,9 +375,18 @@ export const createShopPlan = async ({
                 budget: budget,
                 number_of_items: number_of_items,
                 status: status,
+                items: payload,
             }),
         };
-        await insertPendingOperation(operation_items, rowsToUpdate);
+
+        await insertPendingOperation(operation_shop_plan, []);
+        // const operation_items = {
+        //     entity_type: "items",
+        //     entity_id: "0",
+        //     operation_type: "insert",
+        //     payload: JSON.stringify(payload),
+        // };
+        // await insertPendingOperation(operation_items, rowsToUpdate);
 
         await db.execAsync("COMMIT");
 
@@ -381,28 +442,22 @@ export const showShopPlan = async (
 
 export const updateShopPlan = async ({
     shop_plan_id,
+    budget,
     status,
     items,
 }: UpdateShopPlan): Promise<boolean> => {
     try {
-        validateUpdateShopPlan({ shop_plan_id, status, items });
+        validateUpdateShopPlan({ shop_plan_id, status, budget, items });
 
         const db = await dbPromise;
 
         await db.runAsync(
-            `UPDATE shop_plans SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-            [status, shop_plan_id],
+            `UPDATE shop_plans SET status = ?, budget = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+            [status, budget, shop_plan_id],
         );
 
         const now = new Date().toISOString();
-        let pending_operations = {
-            entity_type: "shop_plans",
-            entity_id: shop_plan_id.toString(),
-            operation_type: "update",
-            payload: JSON.stringify({ status: status, updated_at: now }),
-        };
-
-        await insertPendingOperation(pending_operations, []);
+        let payloadItems: Omit<UpdateItem, "id">[] = [];
 
         for (const item of items) {
             await db.runAsync(
@@ -410,14 +465,27 @@ export const updateShopPlan = async ({
                 [item.price, item.actual_quantity, item.id],
             );
 
-            pending_operations = {
+            payloadItems.push({
+                name: item.name,
+                price: item.price,
+                actual_quantity: item.actual_quantity,
+            });
+        }
+
+        const shop_plan = await db.getFirstAsync<{ server_id: number }>(
+            `SELECT server_id FROM shop_plans WHERE id = ? LIMIT 1`,
+            shop_plan_id,
+        );
+
+        if (shop_plan) {
+            const pending_operations = {
                 entity_type: "shop_plans",
-                entity_id: item.id.toString(),
+                entity_id: shop_plan.server_id.toString(),
                 operation_type: "update",
                 payload: JSON.stringify({
-                    price: item.price,
-                    actual_quantity: item.actual_quantity,
-                    updated_at: now,
+                    status: status,
+                    budget: budget,
+                    items: payloadItems,
                 }),
             };
 
@@ -448,19 +516,30 @@ export const startShopPlan = async (shop_plan_id: number): Promise<boolean> => {
             `UPDATE shop_plans SET status = 1 WHERE id = ?`,
             shop_plan_id,
         );
+        console.log("shopplanid", shop_plan_id);
 
         if (!result.lastInsertRowId)
             throw new Error("Failed to In-Progress Shop Plan");
 
-        const now = new Date().toISOString();
-        const pending_operations = {
-            entity_type: "shop_plans",
-            entity_id: shop_plan_id.toString(),
-            operation_type: "update",
-            payload: JSON.stringify({ status: 1, updated_at: now }),
-        };
+        const server_id = await db.getFirstAsync<{ server_id: number | null }>(
+            `SELECT server_id FROM shop_plans WHERE id = ?`,
+            shop_plan_id,
+        );
+        // const now = new Date().toISOString();
+        if (server_id) {
+            let payload: { status: number; server_id: number | null } = {
+                status: 1,
+                server_id: server_id.server_id,
+            };
+            const pending_operations = {
+                entity_type: "shop_plans",
+                entity_id: shop_plan_id.toString(),
+                operation_type: "start",
+                payload: JSON.stringify(payload),
+            };
 
-        await insertPendingOperation(pending_operations, []);
+            await insertPendingOperation(pending_operations, []);
+        }
 
         return true;
     } catch (error) {

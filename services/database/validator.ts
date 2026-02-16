@@ -89,6 +89,13 @@ export function validateUpdateShopPlan(shopPlan: UpdateShopPlan) {
         throw new Error("ID is required and must be an integer");
 
     if (
+        !shopPlan.budget ||
+        typeof shopPlan.budget !== "number" ||
+        shopPlan.budget < 0
+    )
+        throw new Error("Budget is required and must be an integer");
+
+    if (
         !shopPlan.status ||
         !Number.isInteger(shopPlan.status) ||
         ![2].includes(shopPlan.status)

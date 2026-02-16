@@ -4,9 +4,12 @@ import {
     UpdateShopPlan,
     updateShopPlan,
 } from "@/services/database/database";
+import { runSync } from "@/services/sync/SyncService";
+import NetInfo from "@react-native-community/netinfo";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     FlatList,
     Pressable,
@@ -77,6 +80,7 @@ export default function updateProduct() {
     const [start, setStart] = useState(false);
     const [switchButton, setSwitchButton] = useState(false);
     const [dateIsNow, setDateIsNow] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         fetchPlan(planId);
@@ -170,7 +174,9 @@ export default function updateProduct() {
                             ? Number(newValue)
                             : Number(item.actual_quantity);
 
-                    const total_price = nextPrice * nextQty;
+                    const total_price = parseFloat(
+                        (nextPrice * nextQty).toFixed(2),
+                    );
 
                     return {
                         ...item,
@@ -196,7 +202,7 @@ export default function updateProduct() {
 
         setTextInput((prev) => ({
             ...prev,
-            budget: origBudget - total_price,
+            budget: parseFloat((origBudget - total_price).toFixed(2)),
         }));
     }, [productItems]);
 
@@ -208,6 +214,11 @@ export default function updateProduct() {
 
             if (result === true) {
                 setSwitchButton(true);
+
+                const netState = await NetInfo.fetch();
+                if (netState.isConnected) {
+                    runSync();
+                }
             } else if (result === false) {
                 Alert.alert("Failed To Start", "Another Plan is In Progress");
             }
@@ -218,14 +229,19 @@ export default function updateProduct() {
 
     const completeShopping = async () => {
         try {
+            setIsLoading(true);
             const updatePlan: UpdateShopPlan = {
                 shop_plan_id: Number(planId),
+                budget: textInput.budget,
                 status: 2,
-                items: productItems.map(({ id, price, actual_quantity }) => ({
-                    id: Number(id),
-                    price,
-                    actual_quantity,
-                })),
+                items: productItems.map(
+                    ({ id, name, price, actual_quantity }) => ({
+                        id: Number(id),
+                        name,
+                        price,
+                        actual_quantity,
+                    }),
+                ),
             };
             const result = await updateShopPlan(updatePlan);
 
@@ -233,9 +249,16 @@ export default function updateProduct() {
                 setSwitchButton(false);
                 setTextInput((prev) => ({ ...prev, status: 3 }));
                 setStart(false);
+
+                const netState = await NetInfo.fetch();
+                if (netState.isConnected) {
+                    runSync();
+                }
             }
         } catch (error: any) {
             console.error("error:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -474,7 +497,11 @@ export default function updateProduct() {
                         ]}
                         onPress={completeShopping}
                     >
-                        <Text style={{ color: "white" }}>Complete</Text>
+                        {isLoading ? (
+                            <ActivityIndicator color={"white"} />
+                        ) : (
+                            <Text style={{ color: "white" }}>Complete</Text>
+                        )}
                     </Pressable>
                 )}
             </View>
