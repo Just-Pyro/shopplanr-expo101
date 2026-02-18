@@ -27,9 +27,14 @@ export default function HomeScreen() {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        async () => {
+        (async () => {
             const user = await AsyncStorage.getItem("auth-user");
-        };
+
+            console.log("user", user);
+            if (user) {
+                router.replace("/shopplanr/list");
+            }
+        })();
     }, []);
 
     const handleLogin = async () => {

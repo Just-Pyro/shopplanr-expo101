@@ -205,28 +205,6 @@ export const shopPlanList = async (userId: number): Promise<ShopPlan[]> => {
                 `UPDATE shop_plans SET status = 3, updated_at = CURRENT_TIMESTAMP WHERE id IN (${rowsToUpdate.map(() => "?").join(",")})`,
                 rowsToUpdate.map((r) => r.id),
             );
-
-            // let payload: { status: number; server_id: number | null } = {
-            //     status: 3,
-            //     server_id: null,
-            // };
-
-            // for (const rows of rowsToUpdate) {
-            //     payload = {
-            //         ...payload,
-            //         server_id: rows.server_id,
-            //     };
-            //     const pending_operations = {
-            //         entity_type: "shop_plans",
-            //         entity_id: rows.server_id
-            //             ? rows.server_id.toString()
-            //             : "null",
-            //         operation_type: "start",
-            //         payload: JSON.stringify(payload),
-            //     };
-
-            //     await insertPendingOperation(pending_operations, []);
-            // }
         }
 
         return await db.getAllAsync(
@@ -246,8 +224,6 @@ export const insertPendingOperation = async (
     try {
         const db = await dbPromise;
 
-        // console.log("entity_id:", entity_id, "entity_type:", entity_type);
-        // console.log("rowsToUpdate:", rowsToUpdate);
         if (entity_id != "0") {
             await db.runAsync(
                 `INSERT INTO pending_operations (entity_type, entity_id, operation_type, payload) VALUES(?,?,?,?)`,
@@ -255,7 +231,6 @@ export const insertPendingOperation = async (
             );
         } else {
             for (const row of rowsToUpdate) {
-                // console.log("rowid: ", row.id);
                 await db.runAsync(
                     `INSERT INTO pending_operations (entity_type, entity_id, operation_type, payload) VALUES(?,?,?,?)`,
                     [entity_type, row.id, operation_type, payload],
@@ -456,9 +431,9 @@ export const updateShopPlan = async ({
             [status, budget, shop_plan_id],
         );
 
-        const now = new Date().toISOString();
         let payloadItems: Omit<UpdateItem, "id">[] = [];
 
+        const now = new Date().toISOString();
         for (const item of items) {
             await db.runAsync(
                 `UPDATE items SET price = ?, actual_quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
@@ -485,6 +460,10 @@ export const updateShopPlan = async ({
                 payload: JSON.stringify({
                     status: status,
                     budget: budget,
+                    updated_at: now
+                        .replace("T", " ")
+                        .replace("Z", "")
+                        .split(".")[0],
                     items: payloadItems,
                 }),
             };
@@ -513,7 +492,7 @@ export const startShopPlan = async (shop_plan_id: number): Promise<boolean> => {
         if (row) return false;
 
         const result = await db.runAsync(
-            `UPDATE shop_plans SET status = 1 WHERE id = ?`,
+            `UPDATE shop_plans SET status = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
             shop_plan_id,
         );
         console.log("shopplanid", shop_plan_id);
@@ -521,15 +500,23 @@ export const startShopPlan = async (shop_plan_id: number): Promise<boolean> => {
         if (!result.lastInsertRowId)
             throw new Error("Failed to In-Progress Shop Plan");
 
-        const server_id = await db.getFirstAsync<{ server_id: number | null }>(
-            `SELECT server_id FROM shop_plans WHERE id = ?`,
+        const server_id = await db.getFirstAsync<{
+            server_id: number | null;
+            updated_at: string;
+        }>(
+            `SELECT server_id, updated_at FROM shop_plans WHERE id = ?`,
             shop_plan_id,
         );
-        // const now = new Date().toISOString();
+
         if (server_id) {
-            let payload: { status: number; server_id: number | null } = {
+            let payload: {
+                status: number;
+                server_id: number | null;
+                updated_at: string;
+            } = {
                 status: 1,
                 server_id: server_id.server_id,
+                updated_at: server_id.updated_at,
             };
             const pending_operations = {
                 entity_type: "shop_plans",

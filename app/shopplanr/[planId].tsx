@@ -1,3 +1,4 @@
+import { updateOverdue } from "@/services/api/apiClient";
 import {
     showShopPlan,
     startShopPlan,
@@ -5,6 +6,7 @@ import {
     updateShopPlan,
 } from "@/services/database/database";
 import { runSync } from "@/services/sync/SyncService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -83,6 +85,13 @@ export default function updateProduct() {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        (async () => {
+            const authUser = await AsyncStorage.getItem("auth-user");
+            if (authUser) {
+                const user = JSON.parse(authUser);
+                await updateOverdue(user.id);
+            }
+        })();
         fetchPlan(planId);
     }, []);
 

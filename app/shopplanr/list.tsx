@@ -1,7 +1,6 @@
 import { updateOverdue } from "@/services/api/apiClient";
 import {
     shopPlanList as getPlanList,
-    initDB,
     ShopPlan,
 } from "@/services/database/database";
 import { runSync } from "@/services/sync/SyncService";
@@ -28,10 +27,6 @@ export default function list() {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
-        (async () => {
-            await initDB();
-        })();
-
         fetchShopPlanList();
     }, []);
 
@@ -46,6 +41,9 @@ export default function list() {
             const authUser = await AsyncStorage.getItem("auth-user");
             if (authUser) {
                 const user = JSON.parse(authUser);
+                // const checkUp = await checkUpdates(user.id);
+                // console.log("checkUp:", checkUp);
+
                 const result = await getPlanList(user.id);
 
                 if (result.length > 0) {

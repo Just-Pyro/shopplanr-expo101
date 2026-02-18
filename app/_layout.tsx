@@ -7,6 +7,7 @@ import { Stack } from "expo-router";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { initDB } from "@/services/database/database";
 import { runSync } from "@/services/sync/SyncService";
 import NetInfo from "@react-native-community/netinfo";
 import { useEffect } from "react";
@@ -17,6 +18,10 @@ export const unstable_settings = {
 
 export default function RootLayout() {
     useEffect(() => {
+        (async () => {
+            await initDB();
+        })();
+
         runSync();
 
         const unsub = NetInfo.addEventListener((state) => {

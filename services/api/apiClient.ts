@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const BASE_URL = "http://10.10.1.102:8005/api";
-const BASE_URL = "https://tenantlike-adriel-unmonistic.ngrok-free.dev/api";
+const BASE_URL = "http://10.10.1.102:8005/api";
+// const BASE_URL = "https://tenantlike-adriel-unmonistic.ngrok-free.dev/api";
 
 export interface ApiResponse<T = unknown> {
     success: boolean;
@@ -75,6 +75,7 @@ export interface ShopPlanStatus {
 export interface ShopPlanUpdate {
     status: number;
     budget: number;
+    updated_at: string;
     items: ItemPlanUpdate[];
 }
 
@@ -112,17 +113,28 @@ export const registerUser = async (
 
 export const shopPlanList = async (
     userId: number,
-): Promise<ApiResponse<ShopPlan>> => {
+): Promise<ApiResponse<ShopPlan | any>> => {
     const url = `${BASE_URL}/shop_plans/by-user/${userId}`;
-    const response = await axios.get<ApiResponse<ShopPlan>>(url);
+    const response = await axios.get<ApiResponse<ShopPlan | any>>(url);
+    return response.data;
+};
+
+export const itemsByPlan = async (
+    planId: number,
+): Promise<ApiResponse<any>> => {
+    const url = `${BASE_URL}/shop_plans/items/${planId}`;
+    const response = await axios.get<ApiResponse<any>>(url);
     return response.data;
 };
 
 export const createShopPlan = async (
     shopPlan: ShopPlanCreate,
-): Promise<ApiResponse<ShopPlan>> => {
+): Promise<ApiResponse<ShopPlan | any>> => {
     const url = `${BASE_URL}/shop_plans`;
-    const response = await axios.post<ApiResponse<ShopPlan>>(url, shopPlan);
+    const response = await axios.post<ApiResponse<ShopPlan | any>>(
+        url,
+        shopPlan,
+    );
     return response.data;
 };
 
@@ -147,22 +159,24 @@ export const showShopPlan = async (
 export const updateShopPlan = async (
     shopPlan: ShopPlanUpdate,
     shop_plan_id: number,
-): Promise<ApiResponse<ShopPlanStatus>> => {
+): Promise<ApiResponse<ShopPlanStatus | any>> => {
     const url = `${BASE_URL}/shop_plans/update-status/${shop_plan_id}`;
-    const response = await axios.put<ApiResponse<ShopPlanStatus>>(
+    const response = await axios.put<ApiResponse<ShopPlanStatus | any>>(
         url,
         shopPlan,
     );
 
-    console.log("update api: ", response.data);
     return response.data;
 };
 
 export const startShopPlan = async (
     server_id: number,
-): Promise<ApiResponse<boolean>> => {
+    updated_at: string,
+): Promise<ApiResponse<any>> => {
     const url = `${BASE_URL}/shop_plans/start/${server_id}`;
-    const response = await axios.put<ApiResponse<boolean>>(url);
+    const response = await axios.put<ApiResponse<any>>(url, {
+        updated_at: updated_at,
+    });
     return response.data;
 };
 
@@ -171,5 +185,13 @@ export const updateOverdue = async (
 ): Promise<ApiResponse<boolean>> => {
     const url = `${BASE_URL}/shop_plans/overdue/${userId}`;
     const response = await axios.put<ApiResponse<boolean>>(url);
+    return response.data;
+};
+
+export const checkUpdates = async (
+    userId: number,
+): Promise<ApiResponse<any>> => {
+    const url = `${BASE_URL}/shop_plans/checkUp/${userId}`;
+    const response = await axios.put<ApiResponse<any>>(url);
     return response.data;
 };
