@@ -65,6 +65,7 @@ export default function HomeScreen() {
     const handleReset = async () => {
         try {
             const result = await resetDB();
+            console.log("reset db:", result);
         } catch (error: any) {
             console.error("error", error);
         }

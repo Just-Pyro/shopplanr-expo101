@@ -172,8 +172,8 @@ export const showData = async (): Promise<any> => {
         // );
 
         // return rowsToUpdate;
-        return await db.getAllAsync(`SELECT * FROM pending_operations`);
-        // return await db.getAllAsync(`SELECT * FROM shop_plans`);
+        // return await db.getAllAsync(`SELECT * FROM pending_operations`);
+        return await db.getAllAsync(`SELECT * FROM shop_plans`);
     } catch (error) {
         console.error("error:", error);
     }

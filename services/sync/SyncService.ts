@@ -173,10 +173,12 @@ export async function runSync() {
         }
 
         const userString = await AsyncStorage.getItem("auth-user");
+        console.log("auth user in runSync: ", userString);
         if (userString) {
             const user = JSON.parse(userString);
             const res = await apiShopPlanList(user.id); // retrieve shopplans from starting from 3 days ago
 
+            console.log("res", res);
             if (res) {
                 // loop each plans and check wether to insert or update sqlite
                 for (const plan of res.data) {
@@ -187,13 +189,15 @@ export async function runSync() {
 
                     const items = await itemsByPlan(plan.id);
 
+                    console.log("plan from sync", plan);
+
                     // insert to sqlite if there's no local record
                     if (!local) {
                         await db.runAsync(
                             `INSERT INTO shop_plans (server_id, created_by, address, date_scheduled, budget, number_of_items, status, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)`,
                             [
                                 plan.id,
-                                plan.created_by,
+                                user.id,
                                 plan.address,
                                 plan.date_scheduled,
                                 plan.budget,

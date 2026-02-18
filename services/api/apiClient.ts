@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "http://10.10.1.102:8005/api";
-// const BASE_URL = "https://tenantlike-adriel-unmonistic.ngrok-free.dev/api";
+// const BASE_URL = "http://10.10.1.102:8005/api";
+const BASE_URL = "https://tenantlike-adriel-unmonistic.ngrok-free.dev/api";
 
 export interface ApiResponse<T = unknown> {
     success: boolean;
@@ -113,9 +113,10 @@ export const registerUser = async (
 
 export const shopPlanList = async (
     userId: number,
-): Promise<ApiResponse<ShopPlan | any>> => {
+): Promise<ApiResponse<any>> => {
     const url = `${BASE_URL}/shop_plans/by-user/${userId}`;
-    const response = await axios.get<ApiResponse<ShopPlan | any>>(url);
+    console.log("userid: ", userId);
+    const response = await axios.get<ApiResponse<any>>(url);
     return response.data;
 };
 

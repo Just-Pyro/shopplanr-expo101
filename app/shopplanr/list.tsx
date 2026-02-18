@@ -38,21 +38,22 @@ export default function list() {
 
     const fetchShopPlanList = async () => {
         try {
+            setIsRefreshing(true);
             const authUser = await AsyncStorage.getItem("auth-user");
             if (authUser) {
                 const user = JSON.parse(authUser);
                 // const checkUp = await checkUpdates(user.id);
                 // console.log("checkUp:", checkUp);
+                const netState = await NetInfo.fetch();
+                if (netState.isConnected) {
+                    await runSync();
+                }
 
                 const result = await getPlanList(user.id);
+                console.log("result", result);
 
                 if (result.length > 0) {
                     setSpList(result);
-
-                    const netState = await NetInfo.fetch();
-                    if (netState.isConnected) {
-                        runSync();
-                    }
                 } else {
                     setSpList([]);
                 }
@@ -62,6 +63,8 @@ export default function list() {
             }
         } catch (error) {
             console.error("error", error);
+        } finally {
+            setIsRefreshing(false);
         }
     };
 
@@ -123,11 +126,7 @@ export default function list() {
     };
 
     const handleRefresh = () => {
-        setIsRefreshing(true);
-        console.log("list refreshing");
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 5000);
+        fetchShopPlanList();
     };
 
     return (
