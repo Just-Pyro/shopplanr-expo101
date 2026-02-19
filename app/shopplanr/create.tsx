@@ -57,7 +57,6 @@ export default function create() {
     const [productItems, setProductItems] = useState<Item[]>([]);
     const [showSave, setShowSave] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    // const [date, setDate] = useState<Date>(new Date());
 
     const onChange = (event: any, selectedDate?: Date) => {
         if (selectedDate) {

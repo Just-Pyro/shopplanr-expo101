@@ -77,7 +77,7 @@ export default function HomeScreen() {
             // console.log("type:", typeof result);
             // console.log("po:", result);
             console.log("test");
-            console.log("result", result);
+            console.log("result shopplan", result);
             if (typeof result == "object") {
                 result.forEach((item: any) => {
                     console.log(item);

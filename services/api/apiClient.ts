@@ -136,6 +136,7 @@ export const createShopPlan = async (
         url,
         shopPlan,
     );
+    console.log("create shop plan: ", response.data);
     return response.data;
 };
 

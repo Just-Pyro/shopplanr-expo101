@@ -190,9 +190,25 @@ export async function runSync() {
                     const items = await itemsByPlan(plan.id);
 
                     console.log("plan from sync", plan);
+                    console.log("items from sync", items);
+                    console.log("local plan", local);
+                    console.log("planID", plan.id);
 
                     // insert to sqlite if there's no local record
                     if (!local) {
+                        const dsp = new Date(plan.updated_at);
+                        const formattedsp =
+                            dsp.getFullYear() +
+                            "-" +
+                            String(dsp.getMonth() + 1).padStart(2, "0") +
+                            "-" +
+                            String(dsp.getDate()).padStart(2, "0") +
+                            " " +
+                            String(dsp.getHours()).padStart(2, "0") +
+                            ":" +
+                            String(dsp.getMinutes()).padStart(2, "0") +
+                            ":" +
+                            String(dsp.getSeconds()).padStart(2, "0");
                         await db.runAsync(
                             `INSERT INTO shop_plans (server_id, created_by, address, date_scheduled, budget, number_of_items, status, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)`,
                             [
@@ -203,108 +219,77 @@ export async function runSync() {
                                 plan.budget,
                                 plan.number_of_items,
                                 plan.status,
-                                plan.created_at,
-                                plan.updated_at,
+                                formattedsp,
+                                formattedsp,
                             ],
                         );
-
-                        if (items) {
-                            let query = `INSERT INTO items (server_id, shop_plan_id, name, price, expected_quantity, actual_quantity, created_at, updated_at) VALUES`;
-                            let placeholders: string[] = [];
-                            let values: any[] = [];
-                            for (const item of items.data) {
-                                placeholders.push("(?,?,?,?,?,?,?,?)");
-                                values.push(
-                                    item.id,
-                                    plan.id,
-                                    item.name,
-                                    item.price,
-                                    item.expected_quantity,
-                                    item.actual_quantity,
-                                    item.created_at,
-                                    item.updated_at,
-                                );
-                            }
-
-                            query += placeholders.join(",");
-
-                            await db.runAsync(query, values);
-                        }
-                    } else if (
-                        local &&
-                        new Date(plan.updated_at) > new Date(local?.updated_at)
-                    ) {
+                    } else {
                         // update sqlite row if the server's updated_at is greater than the local's
+                        const dsp = new Date(plan.updated_at);
+                        const formattedsp =
+                            dsp.getFullYear() +
+                            "-" +
+                            String(dsp.getMonth() + 1).padStart(2, "0") +
+                            "-" +
+                            String(dsp.getDate()).padStart(2, "0") +
+                            " " +
+                            String(dsp.getHours()).padStart(2, "0") +
+                            ":" +
+                            String(dsp.getMinutes()).padStart(2, "0") +
+                            ":" +
+                            String(dsp.getSeconds()).padStart(2, "0");
+
                         await db.runAsync(
-                            `UPDATE shop_plans SET budget = ?, status = ?, updated_at = ?`,
-                            [plan.budget, plan.status, plan.updated_at],
+                            `UPDATE shop_plans SET budget = ?, status = ?, updated_at = ? WHERE id = ?`,
+                            [plan.budget, plan.status, formattedsp, local.id],
                         );
+                    }
 
-                        if (items) {
-                            const noserver = await db.getFirstAsync(
-                                `SELECT * FROM items WHERE shop_plan_id = ? AND server_id = NULL`,
-                                plan.id,
+                    if (items) {
+                        if (local) {
+                            await db.runAsync(
+                                `DELETE FROM items WHERE shop_plan_id = ?`,
+                                local.id,
                             );
-
-                            if (noserver) {
-                                await db.runAsync(
-                                    `DELETE FROM items WHERE shop_plan_id = ?`,
-                                );
-
-                                let query = `INSERT INTO items (server_id, shop_plan_id, name, price, expected_quantity, actual_quantity, created_at, updated_at) VALUES`;
-                                let placeholders: string[] = [];
-                                let values: any[] = [];
-                                for (const item of items.data) {
-                                    placeholders.push("(?,?,?,?,?,?,?,?)");
-                                    values.push(
-                                        item.id,
-                                        plan.id,
-                                        item.name,
-                                        item.price,
-                                        item.expected_quantity,
-                                        item.actual_quantity,
-                                        item.created_at,
-                                        item.updated_at,
-                                    );
-                                }
-
-                                query += placeholders.join(",");
-
-                                await db.runAsync(query, values);
-                            } else {
-                                for (const item of items.data) {
-                                    const localItem =
-                                        await db.getFirstAsync<any>(
-                                            `SELECT * FROM items WHERE server_id = ?`,
-                                            item.id,
-                                        );
-
-                                    if (
-                                        localItem &&
-                                        new Date(item.updated_at) >
-                                            new Date(localItem?.updated_at)
-                                    ) {
-                                        await db.runAsync(
-                                            `UPDATE items SET
-                                            name = ?,
-                                            price = ?,
-                                            expected_quantity = ?,
-                                            actual_quantity = ?,
-                                            created_at = ?,
-                                            updated_at = ?`,
-                                            [
-                                                item.name,
-                                                item.price,
-                                                item.expected_quantity,
-                                                item.actual_quantity,
-                                                item.created_at,
-                                                item.updated_at,
-                                            ],
-                                        );
-                                    }
-                                }
-                            }
                         }
+
+                        let query = `INSERT INTO items (server_id, shop_plan_id, name, price, expected_quantity, actual_quantity, created_at, updated_at) VALUES`;
+                        let placeholders: string[] = [];
+                        let values: any[] = [];
+                        for (const item of items.data) {
+                            const di = new Date(item.updated_at);
+                            const formattedi =
+                                di.getFullYear() +
+                                "-" +
+                                String(di.getMonth() + 1).padStart(2, "0") +
+                                "-" +
+                                String(di.getDate()).padStart(2, "0") +
+                                " " +
+                                String(di.getHours()).padStart(2, "0") +
+                                ":" +
+                                String(di.getMinutes()).padStart(2, "0") +
+                                ":" +
+                                String(di.getSeconds()).padStart(2, "0");
+
+                            placeholders.push("(?,?,?,?,?,?,?,?)");
+                            values.push(
+                                item.id,
+                                plan.id,
+                                item.name,
+                                item.price,
+                                item.expected_quantity,
+                                item.actual_quantity,
+                                formattedi,
+                                formattedi,
+                            );
+                        }
+
+                        query += placeholders.join(",");
+
+                        console.log("item query:", query);
+                        console.log("item values:", values);
+
+                        await db.runAsync(query, values);
                     }
                 }
             }

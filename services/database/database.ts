@@ -173,7 +173,13 @@ export const showData = async (): Promise<any> => {
 
         // return rowsToUpdate;
         // return await db.getAllAsync(`SELECT * FROM pending_operations`);
-        return await db.getAllAsync(`SELECT * FROM shop_plans`);
+        const shopplans = await db.getAllAsync<any>(`SELECT * FROM shop_plans`);
+        const items = await db.getAllAsync<any>(`SELECT * FROM items`);
+
+        return {
+            plans: shopplans,
+            items: items,
+        };
     } catch (error) {
         console.error("error:", error);
     }
@@ -496,6 +502,11 @@ export const startShopPlan = async (shop_plan_id: number): Promise<boolean> => {
             shop_plan_id,
         );
         console.log("shopplanid", shop_plan_id);
+        const shopplanNew = await db.getFirstAsync(
+            `SELECT * FROM shop_plans WHERE id = ?`,
+            shop_plan_id,
+        );
+        console.log("shop plan updated: ", shopplanNew);
 
         if (!result.lastInsertRowId)
             throw new Error("Failed to In-Progress Shop Plan");
