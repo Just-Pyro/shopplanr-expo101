@@ -115,7 +115,7 @@ export const shopPlanList = async (
     userId: number,
 ): Promise<ApiResponse<any>> => {
     const url = `${BASE_URL}/shop_plans/by-user/${userId}`;
-    console.log("userid: ", userId);
+    // console.log("userid: ", userId);
     const response = await axios.get<ApiResponse<any>>(url);
     return response.data;
 };
@@ -136,7 +136,7 @@ export const createShopPlan = async (
         url,
         shopPlan,
     );
-    console.log("create shop plan: ", response.data);
+    // console.log("create shop plan: ", response.data);
     return response.data;
 };
 

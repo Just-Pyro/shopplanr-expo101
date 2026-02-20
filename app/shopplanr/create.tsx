@@ -187,145 +187,94 @@ export default function create() {
         <SafeAreaView style={styles.pageContainer}>
             <View style={styles.headContainer}>
                 <View style={styles.inputGroup}>
-                    <View
-                        style={{
-                            flex: 1,
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Address</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                flex: 1,
-                            }}
-                        >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Address"
-                                onChangeText={(text) =>
-                                    setTextInput((prev) => ({
-                                        ...prev,
-                                        address: text,
-                                    }))
-                                }
-                                autoCapitalize="none"
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            flex: 1,
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Date Schedule</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                flex: 1,
-                            }}
-                        >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Schedule"
-                                onChangeText={(text) =>
-                                    setTextInput((prev) => ({
-                                        ...prev,
-                                        date_scheduled: text,
-                                    }))
-                                }
-                                value={textInput.date_scheduled}
-                                showSoftInputOnFocus={false}
-                                onPress={() => showMode("date")}
-                                autoCapitalize="none"
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
+                    <Text style={[styles.inputLabel, styles.textLightTheme]}>
+                        Address
+                    </Text>
+                    <TextInput
+                        style={[styles.textInput, styles.textLightTheme]}
+                        placeholder="Address"
+                        onChangeText={(text) =>
+                            setTextInput((prev) => ({
+                                ...prev,
+                                address: text,
+                            }))
+                        }
+                        autoCapitalize="none"
+                    />
                 </View>
                 <View style={styles.inputGroup}>
-                    <View
-                        style={{
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Budget</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                width: 200,
-                            }}
+                    <Text style={[styles.inputLabel, styles.textLightTheme]}>
+                        Date Schedule
+                    </Text>
+                    <TextInput
+                        style={[styles.textInput, styles.textLightTheme]}
+                        placeholder="Schedule"
+                        onChangeText={(text) =>
+                            setTextInput((prev) => ({
+                                ...prev,
+                                date_scheduled: text,
+                            }))
+                        }
+                        value={textInput.date_scheduled}
+                        showSoftInputOnFocus={false}
+                        onPress={() => showMode("date")}
+                        autoCapitalize="none"
+                    />
+                </View>
+                <View style={styles.dualInputGroup}>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[styles.inputLabel, styles.textLightTheme]}
                         >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Budget"
-                                onChangeText={(text) =>
-                                    setTextInput((prev) => ({
-                                        ...prev,
-                                        budget: Number(text),
-                                    }))
-                                }
-                                value={textInput.budget.toString()}
-                                autoCapitalize="none"
-                                keyboardType="number-pad"
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Total</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                width: 100,
-                            }}
-                        >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Total Items"
-                                readOnly={true}
-                                value={textInput.number_of_items.toString()}
-                                autoCapitalize="none"
-                                keyboardType="number-pad"
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            position: "relative",
-                            height: 34,
-                            flex: 1,
-                            marginTop: 24,
-                        }}
-                    >
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.secondaryButton,
-                                {
-                                    top: pressed ? 6 : 0,
-                                    left: pressed ? 6 : 0,
-                                    position: pressed ? "absolute" : "relative",
-                                },
+                            Budget
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.textInputHalf,
+                                styles.textLightTheme,
                             ]}
-                            onPress={addItem}
-                        >
-                            <Text style={{ color: "white" }}>Add Item</Text>
-                        </Pressable>
-                        <View
-                            style={[styles.inputShadow, { borderRadius: 10 }]}
-                        ></View>
+                            placeholder="Budget"
+                            onChangeText={(text) =>
+                                setTextInput((prev) => ({
+                                    ...prev,
+                                    budget: Number(text),
+                                }))
+                            }
+                            value={textInput.budget.toString()}
+                            autoCapitalize="none"
+                            keyboardType="number-pad"
+                        />
                     </View>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[styles.inputLabel, styles.textLightTheme]}
+                        >
+                            Total
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.textInputHalf,
+                                styles.textLightTheme,
+                            ]}
+                            placeholder="Total Items"
+                            readOnly={true}
+                            value={textInput.number_of_items.toString()}
+                            autoCapitalize="none"
+                            keyboardType="number-pad"
+                        />
+                    </View>
+                </View>
+                <View
+                    style={{
+                        position: "relative",
+                        height: 34,
+                        flex: 1,
+                        marginTop: 24,
+                    }}
+                >
+                    <Pressable style={styles.primaryBtn} onPress={addItem}>
+                        <Text style={{ color: "white" }}>Add Item</Text>
+                    </Pressable>
                 </View>
             </View>
             <View style={styles.bodyContainer}>
@@ -453,18 +402,39 @@ const Item = React.memo(
 const styles = StyleSheet.create({
     pageContainer: {
         height: "100%",
-        backgroundColor: "white",
-        justifyContent: "center",
+        backgroundColor: "#F7F7F7",
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        gap: 32,
         alignItems: "center",
-        paddingTop: 0,
     },
     headContainer: {
-        paddingTop: 30,
-        paddingHorizontal: 30,
-        borderBottomWidth: 1,
-        borderBottomColor: "lightgray",
-        width: "100%",
-        gap: 20,
+        gap: 8,
+    },
+    textInput: {
+        padding: 20,
+        width: 336,
+        height: 57,
+        zIndex: 1,
+        backgroundColor: "#EAEAEA",
+        borderRadius: 15,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    textInputHalf: {
+        padding: 20,
+        width: 146,
+        height: 57,
+        zIndex: 1,
+        backgroundColor: "#EAEAEA",
+        borderRadius: 15,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    inputLabel: {
+        marginLeft: 12,
+    },
+    dualInputGroup: {
+        flexDirection: "row",
+        justifyContent: "space-between",
     },
     bodyContainer: {
         position: "relative",
@@ -473,14 +443,26 @@ const styles = StyleSheet.create({
         width: "100%",
         flex: 1,
     },
-    textInput: {
-        borderWidth: 4,
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        height: 40,
-        zIndex: 1,
-        backgroundColor: "white",
+    textLightTheme: {
+        color: "#1A1A1A",
     },
+    primaryBtn: {
+        borderRadius: 15,
+        display: "flex",
+        justifyContent: "center",
+        alignContent: "center",
+        backgroundColor: "#CC5500",
+        flexDirection: "row",
+        width: 336,
+        height: 57,
+        padding: 16,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    btnFont: {
+        fontSize: 18,
+        color: "#FFF",
+    },
+
     inputShadow: {
         height: 40,
         position: "absolute",
@@ -492,10 +474,7 @@ const styles = StyleSheet.create({
         zIndex: -1,
     },
     inputGroup: {
-        flexDirection: "row",
-        width: "100%",
-        gap: 10,
-        marginBottom: 34,
+        gap: 2,
     },
     primaryButton: {
         paddingVertical: 15,

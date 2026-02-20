@@ -38,13 +38,13 @@ export async function runSync() {
             `SELECT * FROM pending_operations ORDER BY created_at ASC`,
         );
 
-        console.log("ops", ops);
+        // console.log("ops", ops);
 
         for (const op of ops) {
             try {
                 const payload = op.payload ? JSON.parse(op.payload) : null;
 
-                console.log("payload", payload);
+                // console.log("payload", payload);
                 if (op.entity_type === "shop_plans") {
                     if (op.operation_type === "insert") {
                         const response = await apiCreateShopPlan(payload);
@@ -173,12 +173,12 @@ export async function runSync() {
         }
 
         const userString = await AsyncStorage.getItem("auth-user");
-        console.log("auth user in runSync: ", userString);
+        // console.log("auth user in runSync: ", userString);
         if (userString) {
             const user = JSON.parse(userString);
             const res = await apiShopPlanList(user.id); // retrieve shopplans from starting from 3 days ago
 
-            console.log("res", res);
+            // console.log("res", res);
             if (res) {
                 // loop each plans and check wether to insert or update sqlite
                 for (const plan of res.data) {
@@ -189,10 +189,10 @@ export async function runSync() {
 
                     const items = await itemsByPlan(plan.id);
 
-                    console.log("plan from sync", plan);
-                    console.log("items from sync", items);
-                    console.log("local plan", local);
-                    console.log("planID", plan.id);
+                    // console.log("plan from sync", plan);
+                    // console.log("items from sync", items);
+                    // console.log("local plan", local);
+                    // console.log("planID", plan.id);
 
                     // insert to sqlite if there's no local record
                     if (!local) {
@@ -286,8 +286,8 @@ export async function runSync() {
 
                         query += placeholders.join(",");
 
-                        console.log("item query:", query);
-                        console.log("item values:", values);
+                        // console.log("item query:", query);
+                        // console.log("item values:", values);
 
                         await db.runAsync(query, values);
                     }
@@ -298,6 +298,6 @@ export async function runSync() {
         console.log("error", e);
     } finally {
         isSyncing = false;
-        console.log("done syncing");
+        // console.log("done syncing");
     }
 }

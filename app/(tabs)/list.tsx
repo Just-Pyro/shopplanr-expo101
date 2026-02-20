@@ -50,7 +50,7 @@ export default function list() {
                 }
 
                 const result = await getPlanList(user.id);
-                console.log("result", result);
+                // console.log("result", result);
 
                 if (result.length > 0) {
                     setSpList(result);
@@ -59,22 +59,12 @@ export default function list() {
                 }
 
                 const uod = await updateOverdue(user.id);
-                console.log("uod:", uod);
+                // console.log("uod:", uod);
             }
         } catch (error) {
             console.error("error", error);
         } finally {
             setIsRefreshing(false);
-        }
-    };
-
-    const handleLogout = async () => {
-        try {
-            await AsyncStorage.removeItem("auth-user");
-
-            router.replace("/");
-        } catch (error) {
-            console.error("error:", error);
         }
     };
 
@@ -92,17 +82,7 @@ export default function list() {
 
         return (
             <Pressable
-                style={{
-                    borderWidth: 4,
-                    width: "100%",
-                    padding: 20,
-                    marginBottom: 15,
-                    position: "relative",
-                    alignSelf: "center",
-                    boxShadow: "0px 4px 4px lightgray",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                }}
+                style={styles.planCard}
                 onPress={() => {
                     router.push({
                         pathname: "/shopplanr/[planId]",
@@ -113,14 +93,24 @@ export default function list() {
                 <Text
                     style={{
                         flex: 1,
-                        fontWeight: "bold",
-                        fontSize: 24,
+                        fontSize: 20,
                     }}
                 >
                     {address}
                 </Text>
-                <Text style={{ width: 100 }}>Items: {total}</Text>
-                <Text style={{ width: 100 }}>{statusName[status]}</Text>
+                <View style={styles.planCardFooter}>
+                    <Text style={styles.textFooter}>Total Items: {total}</Text>
+                    <Text
+                        style={[
+                            statusName[status] == "Overdue"
+                                ? styles.textDue
+                                : styles.textLightTheme,
+                            styles.textFooter,
+                        ]}
+                    >
+                        {statusName[status]}
+                    </Text>
+                </View>
             </Pressable>
         );
     };
@@ -131,20 +121,12 @@ export default function list() {
 
     return (
         <SafeAreaView style={styles.pageContainer}>
-            <View style={styles.headerContainer}>
-                <Link href="/shopplanr/create" asChild>
-                    <Pressable style={styles.primaryButton}>
-                        <Text style={{ color: "white" }}>Create ShopPlan</Text>
-                    </Pressable>
-                </Link>
-            </View>
-            <View
-                style={{
-                    flex: 1,
-                    width: "100%",
-                    position: "relative",
-                }}
-            >
+            <Link href="/shopplanr/create" asChild>
+                <Pressable style={styles.primaryBtn}>
+                    <Text style={styles.btnFont}>Add Plan</Text>
+                </Pressable>
+            </Link>
+            <View style={styles.listContainer}>
                 <FlatList
                     data={spList}
                     renderItem={({ item }) => (
@@ -158,31 +140,15 @@ export default function list() {
                             status={item.status}
                         />
                     )}
+                    ItemSeparatorComponent={() => (
+                        <View style={{ height: 16 }} />
+                    )}
                     keyExtractor={(item) =>
                         item.id?.toString() ?? "fallback-key"
                     }
                     onRefresh={handleRefresh}
                     refreshing={isRefreshing}
                 />
-                <Pressable
-                    style={({ pressed }) => [
-                        styles.logoutButton,
-                        {
-                            backgroundColor: pressed ? "red" : "transparent",
-                        },
-                    ]}
-                    onPress={handleLogout}
-                >
-                    {({ pressed }) => (
-                        <Text
-                            style={{
-                                color: pressed ? "white" : "red",
-                            }}
-                        >
-                            Logout
-                        </Text>
-                    )}
-                </Pressable>
             </View>
         </SafeAreaView>
     );
@@ -191,37 +157,49 @@ export default function list() {
 const styles = StyleSheet.create({
     pageContainer: {
         height: "100%",
-        borderWidth: 1,
-        backgroundColor: "white",
-        padding: 30,
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 10,
-    },
-    primaryButton: {
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        width: "100%",
-        borderRadius: 10,
-        backgroundColor: "black",
-        justifyContent: "center",
+        backgroundColor: "#F7F7F7",
+        padding: 16,
+        gap: 32,
         alignItems: "center",
     },
-    logoutButton: {
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        width: "80%",
-        borderRadius: 10,
-        borderWidth: 4,
-        borderColor: "red",
+    primaryBtn: {
+        borderRadius: 15,
+        display: "flex",
         justifyContent: "center",
-        alignItems: "center",
-        alignSelf: "center",
-        position: "absolute",
-        bottom: 10,
-        boxShadow: "0px 2px 4px lightgray",
+        alignContent: "center",
+        backgroundColor: "#CC5500",
+        flexDirection: "row",
+        width: 336,
+        height: 57,
+        padding: 16,
+        boxShadow: "0 4px 4px lightgray",
     },
-    headerContainer: {
-        width: "100%",
+    btnFont: {
+        fontSize: 18,
+        color: "#FFF",
+    },
+    planCard: {
+        width: 336,
+        padding: 20,
+        borderRadius: 15,
+        backgroundColor: "#EAEAEA",
+        boxShadow: "0 4px 4px lightgray",
+        gap: 20,
+    },
+    listContainer: {
+        flex: 1,
+    },
+    planCardFooter: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    textLightTheme: {
+        color: "#1A1A1A",
+    },
+    textDue: {
+        color: "#9F2305",
+    },
+    textFooter: {
+        fontSize: 12,
     },
 });

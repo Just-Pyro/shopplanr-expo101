@@ -40,19 +40,32 @@ export default function RootLayout() {
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
             <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
                 <Stack.Screen
-                    name="modal"
-                    options={{ presentation: "modal", title: "Modal" }}
-                />
-                <Stack.Screen
-                    name="shopplanr/list"
+                    name="index"
                     options={{
                         headerShown: false,
                         presentation: "card",
                         animation: "none",
                     }}
+                />
+                <Stack.Screen
+                    name="register"
+                    options={{
+                        headerShown: false,
+                        presentation: "card",
+                        animation: "none",
+                    }}
+                />
+                <Stack.Screen
+                    name="(tabs)"
+                    options={{
+                        headerShown: false,
+                        animation: "none",
+                    }}
+                />
+                <Stack.Screen
+                    name="modal"
+                    options={{ presentation: "modal", title: "Modal" }}
                 />
                 <Stack.Screen
                     name="shopplanr/create"
@@ -69,6 +82,7 @@ export default function RootLayout() {
                         title: "Create Plan",
                     }}
                 />
+
                 <Stack.Screen
                     name="shopplanr/[planId]"
                     options={{

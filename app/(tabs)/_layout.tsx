@@ -2,9 +2,10 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Text } from "react-native";
 
 export default function TabLayout() {
     const colorScheme = useColorScheme();
@@ -15,27 +16,51 @@ export default function TabLayout() {
                 tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
                 headerShown: false,
                 tabBarButton: HapticTab,
+                tabBarLabelPosition: "beside-icon",
+                tabBarStyle: { backgroundColor: "#1A1A1A" },
             }}
         >
             <Tabs.Screen
-                name="index"
+                name="list"
                 options={{
-                    title: "Login",
-                    tabBarIcon: ({ color }) => (
-                        <IconSymbol size={28} name="house.fill" color={color} />
+                    title: "Home",
+                    tabBarIcon: () => (
+                        <MaterialIcons
+                            color={"#fff"}
+                            size={22}
+                            name="home-filled"
+                        />
+                    ),
+                    tabBarLabel: () => (
+                        <Text
+                            style={{
+                                color: "#fff",
+                            }}
+                        >
+                            Home
+                        </Text>
                     ),
                 }}
             />
             <Tabs.Screen
-                name="register"
+                name="settings"
                 options={{
-                    title: "Register",
-                    tabBarIcon: ({ color }) => (
-                        <IconSymbol
-                            size={28}
-                            name="paperplane.fill"
-                            color={color}
+                    title: "Settings",
+                    tabBarIcon: () => (
+                        <MaterialIcons
+                            color={"#fff"}
+                            size={22}
+                            name="settings"
                         />
+                    ),
+                    tabBarLabel: () => (
+                        <Text
+                            style={{
+                                color: "#fff",
+                            }}
+                        >
+                            Settings
+                        </Text>
                     ),
                 }}
             />

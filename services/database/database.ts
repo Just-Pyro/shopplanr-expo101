@@ -501,12 +501,12 @@ export const startShopPlan = async (shop_plan_id: number): Promise<boolean> => {
             `UPDATE shop_plans SET status = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
             shop_plan_id,
         );
-        console.log("shopplanid", shop_plan_id);
+        // console.log("shopplanid", shop_plan_id);
         const shopplanNew = await db.getFirstAsync(
             `SELECT * FROM shop_plans WHERE id = ?`,
             shop_plan_id,
         );
-        console.log("shop plan updated: ", shopplanNew);
+        // console.log("shop plan updated: ", shopplanNew);
 
         if (!result.lastInsertRowId)
             throw new Error("Failed to In-Progress Shop Plan");
