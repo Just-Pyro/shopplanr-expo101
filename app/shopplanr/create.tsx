@@ -264,20 +264,42 @@ export default function create() {
                         />
                     </View>
                 </View>
-                <View
-                    style={{
-                        position: "relative",
-                        height: 34,
-                        flex: 1,
-                        marginTop: 24,
-                    }}
+                <Pressable
+                    style={[styles.primaryBtn, { marginTop: 10 }]}
+                    onPress={addItem}
                 >
-                    <Pressable style={styles.primaryBtn} onPress={addItem}>
-                        <Text style={{ color: "white" }}>Add Item</Text>
-                    </Pressable>
-                </View>
+                    <Text style={styles.btnFont}>Add Item</Text>
+                </Pressable>
             </View>
-            <View style={styles.bodyContainer}>
+            <View style={styles.listContainer}>
+                <FlatList
+                    data={productItems}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <Item
+                            id={item.id}
+                            name={item.name}
+                            expected_quantity={item.expected_quantity}
+                            changeValue={updateProduct}
+                            handleRemove={handleRemoveItem}
+                            setTextInput={setTextInput}
+                        />
+                    )}
+                />
+                {showSave && (
+                    <Pressable
+                        style={[styles.primaryBtn, styles.createBtn]}
+                        onPress={handleCreate}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color={"white"} />
+                        ) : (
+                            <Text style={styles.btnFont}>Create Plan</Text>
+                        )}
+                    </Pressable>
+                )}
+            </View>
+            {/* <View style={styles.bodyContainer}>
                 <View
                     style={{
                         height: 30,
@@ -316,33 +338,12 @@ export default function create() {
                                 changeValue={updateProduct}
                                 handleRemove={handleRemoveItem}
                                 setTextInput={setTextInput}
-                            />
-                        )}
-                    />
-                </View>
-
-                {showSave && (
-                    <Pressable
-                        style={[
-                            styles.primaryButton,
-                            {
-                                position: "absolute",
-                                bottom: 10,
-                                alignSelf: "center",
-                                width: "95%",
-                                elevation: 2,
-                            },
-                        ]}
-                        onPress={handleCreate}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color={"white"} />
-                        ) : (
-                            <Text style={{ color: "white" }}>Create Plan</Text>
-                        )}
-                    </Pressable>
-                )}
-            </View>
+                                />
+                                )}
+                                />
+                    </View>
+                                
+                </View> */}
         </SafeAreaView>
     );
 }
@@ -357,42 +358,63 @@ const Item = React.memo(
         setTextInput,
     }: ItemProp) => {
         return (
-            <View
-                style={{
-                    flexDirection: "row",
-                    gap: 15,
-                    marginBottom: 10,
-                }}
-            >
-                <TextInput
-                    style={[styles.textInput, { flex: 1 }]}
-                    value={name}
-                    placeholder="Item Name"
-                    onChangeText={(text) => changeValue(id, text, "name")}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                />
-                <TextInput
-                    style={[styles.textInput, { width: 100 }]}
-                    value={expected_quantity.toString()}
-                    onChangeText={(text) => {
-                        changeValue(id, text, "expected_quantity");
-                    }}
-                    keyboardType="number-pad"
-                />
+            <View style={styles.itemCard}>
+                <View style={styles.inputGroup}>
+                    <Text
+                        style={[
+                            styles.inputLabel,
+                            styles.textLightTheme,
+                            { fontSize: 14 },
+                        ]}
+                    >
+                        Item Name
+                    </Text>
+                    <TextInput
+                        style={[styles.cardInputReg, styles.textLightTheme]}
+                        value={name}
+                        placeholder="Item Name"
+                        onChangeText={(text) => changeValue(id, text, "name")}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+                </View>
+                <View style={styles.inputGroup}>
+                    <Text
+                        style={[
+                            styles.inputLabel,
+                            styles.textLightTheme,
+                            { fontSize: 14 },
+                        ]}
+                    >
+                        Expected Quantity
+                    </Text>
+                    <TextInput
+                        style={[
+                            styles.cardInputReg,
+                            styles.textInputHalf,
+                            { backgroundColor: "#FFF" },
+                        ]}
+                        value={expected_quantity.toString()}
+                        onChangeText={(text) => {
+                            changeValue(id, text, "expected_quantity");
+                        }}
+                        keyboardType="number-pad"
+                    />
+                </View>
                 <Pressable
                     style={{
-                        borderWidth: 4,
-                        borderColor: "red",
                         alignItems: "center",
                         justifyContent: "center",
-                        width: 40,
-                        height: 40,
+                        width: 20,
+                        height: 20,
                         borderRadius: 10,
+                        position: "absolute",
+                        top: 5,
+                        right: 5,
                     }}
                     onPress={() => handleRemove(id)}
                 >
-                    <MaterialIcons name="close" size={32} color="red" />
+                    <MaterialIcons name="close" size={14} color="#1A1A1A" />
                 </Pressable>
             </View>
         );
@@ -405,11 +427,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#F7F7F7",
         paddingHorizontal: 16,
         paddingBottom: 16,
-        gap: 32,
         alignItems: "center",
+        gap: 32,
     },
     headContainer: {
         gap: 8,
+        height: "auto",
     },
     textInput: {
         padding: 20,
@@ -461,6 +484,35 @@ const styles = StyleSheet.create({
     btnFont: {
         fontSize: 18,
         color: "#FFF",
+    },
+    listContainer: {
+        flex: 1,
+        overflow: "visible",
+        paddingBottom: 67,
+        position: "relative",
+    },
+    itemCard: {
+        width: 336,
+        borderRadius: 16,
+        boxShadow: "0 4px 4px lightgray",
+        padding: 20,
+        backgroundColor: "#EAEAEA",
+        position: "relative",
+        gap: 16,
+        marginBottom: 20,
+    },
+    cardInputReg: {
+        padding: 20,
+        width: 285,
+        height: 57,
+        zIndex: 1,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 15,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    createBtn: {
+        position: "absolute",
+        bottom: 0,
     },
 
     inputShadow: {
