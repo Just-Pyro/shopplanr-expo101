@@ -299,51 +299,6 @@ export default function create() {
                     </Pressable>
                 )}
             </View>
-            {/* <View style={styles.bodyContainer}>
-                <View
-                    style={{
-                        height: 30,
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10,
-                        borderWidth: 1,
-                        borderColor: "lightgray",
-                        paddingHorizontal: 20,
-                        paddingTop: 5,
-                        flexDirection: "row",
-                    }}
-                >
-                    <Text style={{ flex: 1 }}>Item Name</Text>
-                    <Text style={{ width: 140 }}>Expected QTY</Text>
-                </View>
-                <View
-                    style={{
-                        flex: 1,
-                        backgroundColor: "#e8e8e8",
-                        borderBottomLeftRadius: 10,
-                        borderBottomRightRadius: 10,
-                        paddingTop: 5,
-                        paddingBottom: 15,
-                        paddingHorizontal: 15,
-                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25) inset",
-                    }}
-                >
-                    <FlatList
-                        data={productItems}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <Item
-                                id={item.id}
-                                name={item.name}
-                                expected_quantity={item.expected_quantity}
-                                changeValue={updateProduct}
-                                handleRemove={handleRemoveItem}
-                                setTextInput={setTextInput}
-                                />
-                                )}
-                                />
-                    </View>
-                                
-                </View> */}
         </SafeAreaView>
     );
 }
@@ -514,38 +469,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 0,
     },
-
-    inputShadow: {
-        height: 40,
-        position: "absolute",
-        top: 6,
-        left: 6,
-        borderWidth: 2,
-        width: "100%",
-        backgroundColor: "black",
-        zIndex: -1,
-    },
     inputGroup: {
         gap: 2,
-    },
-    primaryButton: {
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        width: "100%",
-        borderRadius: 10,
-        backgroundColor: "black",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    secondaryButton: {
-        // paddingVertical: 10,
-        // paddingHorizontal: 20,
-        height: 40,
-        backgroundColor: "#24a0ed",
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: 4,
-        borderRadius: 10,
-        width: "100%",
     },
 });

@@ -275,241 +275,124 @@ export default function updateProduct() {
         <SafeAreaView style={styles.pageContainer}>
             <View style={styles.headContainer}>
                 <View style={styles.inputGroup}>
-                    <View
-                        style={{
-                            flex: 1,
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Address</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                flex: 1,
-                            }}
-                        >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Address"
-                                // onChangeText={(text) =>
-                                //     setTextInput((prev) => ({
-                                //         ...prev,
-                                //         address: text,
-                                //     }))
-                                // }
-                                autoCapitalize="none"
-                                value={textInput.address}
-                                readOnly
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            flex: 1,
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Date Schedule</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                flex: 1,
-                            }}
-                        >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Schedule"
-                                // onChangeText={(text) =>
-                                //     setTextInput((prev) => ({
-                                //         ...prev,
-                                //         date_scheduled: text,
-                                //     }))
-                                // }
-                                value={textInput.date_scheduled}
-                                showSoftInputOnFocus={false}
-                                // onPress={() => showMode("date")}
-                                autoCapitalize="none"
-                                readOnly
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
+                    <Text style={[styles.inputLabel, styles.textLightTheme]}>
+                        Address
+                    </Text>
+                    <TextInput
+                        style={[styles.textInput, styles.textLightTheme]}
+                        placeholder="Address"
+                        // onChangeText={(text) =>
+                        //     setTextInput((prev) => ({
+                        //         ...prev,
+                        //         address: text,
+                        //     }))
+                        // }
+                        autoCapitalize="none"
+                        value={textInput.address}
+                        readOnly
+                    />
                 </View>
                 <View style={styles.inputGroup}>
-                    <View
-                        style={{
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Budget</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                width: 200,
-                            }}
+                    <Text style={[styles.inputLabel, styles.textLightTheme]}>
+                        Date Schedule
+                    </Text>
+                    <TextInput
+                        style={[styles.textInput, styles.textLightTheme]}
+                        placeholder="Schedule"
+                        // onChangeText={(text) =>
+                        //     setTextInput((prev) => ({
+                        //         ...prev,
+                        //         date_scheduled: text,
+                        //     }))
+                        // }
+                        value={textInput.date_scheduled}
+                        showSoftInputOnFocus={false}
+                        // onPress={() => showMode("date")}
+                        autoCapitalize="none"
+                        readOnly
+                    />
+                </View>
+                <View style={styles.dualInputGroup}>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[styles.inputLabel, styles.textLightTheme]}
                         >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Budget"
-                                // onChangeText={(text) =>
-                                //     setTextInput((prev) => ({
-                                //         ...prev,
-                                //         budget: Number(text),
-                                //     }))
-                                // }
-                                value={textInput.budget.toString()}
-                                autoCapitalize="none"
-                                keyboardType="number-pad"
-                                readOnly
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            gap: 5,
-                        }}
-                    >
-                        <Text>Total</Text>
-                        <View
-                            style={{
-                                position: "relative",
-                                height: 34,
-                                width: 100,
-                            }}
-                        >
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Total Items"
-                                readOnly
-                                value={textInput.number_of_items.toString()}
-                                autoCapitalize="none"
-                                keyboardType="number-pad"
-                            />
-                            <View style={styles.inputShadow}></View>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            position: "relative",
-                            height: 34,
-                            flex: 1,
-                            marginTop: 24,
-                            width: "35%",
-                        }}
-                    >
-                        {/* <Pressable
-                            style={({ pressed }) => [
-                                styles.secondaryButton,
-                                {
-                                    top: pressed ? 6 : 0,
-                                    left: pressed ? 6 : 0,
-                                    position: pressed ? "absolute" : "relative",
-                                },
+                            Budget
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.textInputHalf,
+                                styles.textLightTheme,
                             ]}
-                            // onPress={addItem}
+                            placeholder="Budget"
+                            // onChangeText={(text) =>
+                            //     setTextInput((prev) => ({
+                            //         ...prev,
+                            //         budget: Number(text),
+                            //     }))
+                            // }
+                            value={textInput.budget.toString()}
+                            autoCapitalize="none"
+                            keyboardType="number-pad"
+                            readOnly
+                        />
+                    </View>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[styles.inputLabel, styles.textLightTheme]}
                         >
-                            <Text style={{ color: "white" }}>Add Item</Text>
-                        </Pressable>
-                        <View
-                            style={[styles.inputShadow, { borderRadius: 10 }]}
-                        ></View> */}
+                            Total
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.textInputHalf,
+                                styles.textLightTheme,
+                            ]}
+                            placeholder="Total Items"
+                            readOnly
+                            value={textInput.number_of_items.toString()}
+                            autoCapitalize="none"
+                            keyboardType="number-pad"
+                        />
                     </View>
                 </View>
             </View>
-            <View style={styles.bodyContainer}>
-                <View
-                    style={{
-                        height: 30,
-                        borderTopLeftRadius: 10,
-                        borderTopRightRadius: 10,
-                        borderWidth: 1,
-                        borderColor: "lightgray",
-                        paddingHorizontal: 20,
-                        paddingTop: 5,
-                        flexDirection: "row",
-                        gap: 15,
-                    }}
-                >
-                    <Text style={{ flex: 1, paddingLeft: 5 }}>Item Name</Text>
-                    <Text style={{ width: 60, paddingLeft: 5 }}>E. QTY</Text>
-                    <Text style={{ width: 60, paddingLeft: 5 }}>A. QTY</Text>
-                    <Text style={{ width: 75, paddingLeft: 5 }}>Price</Text>
-                    <Text style={{ width: 100, paddingLeft: 5 }}>Total</Text>
-                </View>
-                <View
-                    style={{
-                        borderWidth: 1,
-                        flex: 1,
-                        backgroundColor: "#e8e8e8",
-                        borderBottomLeftRadius: 10,
-                        borderBottomRightRadius: 10,
-                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25) inset",
-                        paddingTop: 5,
-                        paddingBottom: 15,
-                        paddingHorizontal: 15,
-                    }}
-                >
-                    <FlatList
-                        data={productItems}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <Item
-                                id={item.id}
-                                name={item.name}
-                                expected_quantity={item.expected_quantity}
-                                actual_quantity={item.actual_quantity}
-                                price={item.price}
-                                total={item.total}
-                                changeValue={updateProduct}
-                                start={start}
-                            />
-                        )}
-                        scrollEnabled={false}
-                    />
-                </View>
+            <View style={styles.listContainer}>
+                <FlatList
+                    data={productItems}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <Item
+                            id={item.id}
+                            name={item.name}
+                            expected_quantity={item.expected_quantity}
+                            actual_quantity={item.actual_quantity}
+                            price={item.price}
+                            total={item.total}
+                            changeValue={updateProduct}
+                            start={start}
+                        />
+                    )}
+                />
 
                 {textInput.status == 0 && !switchButton && dateIsNow && (
                     <Pressable
-                        style={[
-                            styles.primaryButton,
-                            {
-                                position: "absolute",
-                                bottom: 10,
-                                alignSelf: "center",
-                                width: "95%",
-                                elevation: 2,
-                            },
-                        ]}
+                        style={[styles.primaryBtn, styles.createBtn]}
                         onPress={startShopping}
                     >
-                        <Text style={{ color: "white" }}>Start Shopping</Text>
+                        <Text style={styles.btnFont}>Start Shopping</Text>
                     </Pressable>
                 )}
 
                 {(switchButton || textInput.status == 1) && (
                     <Pressable
-                        style={[
-                            styles.primaryButton,
-                            {
-                                position: "absolute",
-                                bottom: 10,
-                                alignSelf: "center",
-                                width: "95%",
-                                elevation: 2,
-                                backgroundColor: "#24a0ed",
-                            },
-                        ]}
+                        style={[styles.primaryBtn, styles.createBtn]}
                         onPress={completeShopping}
                     >
                         {isLoading ? (
                             <ActivityIndicator color={"white"} />
                         ) : (
-                            <Text style={{ color: "white" }}>Complete</Text>
+                            <Text style={styles.btnFont}>Complete</Text>
                         )}
                     </Pressable>
                 )}
@@ -530,55 +413,124 @@ const Item = React.memo(
         start,
     }: ItemProp) => {
         return (
-            <View
-                style={{
-                    flexDirection: "row",
-                    gap: 15,
-                    marginBottom: 10,
-                }}
-            >
-                <TextInput
-                    style={[styles.textInput, { flex: 1 }]}
-                    value={name}
-                    placeholder="Item Name"
-                    onChangeText={(text) => changeValue(id, text, "name")}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    readOnly
-                />
-                <TextInput
-                    style={[styles.textInput, { width: 60 }]}
-                    value={expected_quantity.toString()}
-                    onChangeText={(text) => {
-                        changeValue(id, text, "expected_quantity");
-                    }}
-                    keyboardType="number-pad"
-                    readOnly
-                />
-                <TextInput
-                    style={[styles.textInput, { width: 60 }]}
-                    value={actual_quantity.toString()}
-                    onChangeText={(text) => {
-                        changeValue(id, text, "actual_quantity");
-                    }}
-                    keyboardType="number-pad"
-                    readOnly={!start}
-                />
-                <TextInput
-                    style={[styles.textInput, { width: 75 }]}
-                    value={price.toString()}
-                    onChangeText={(text) => {
-                        changeValue(id, text, "price");
-                    }}
-                    keyboardType="number-pad"
-                    readOnly={!start}
-                />
-                <TextInput
-                    style={[styles.textInput, { width: 100 }]}
-                    value={total.toString()}
-                    keyboardType="number-pad"
-                    readOnly
-                />
+            <View style={styles.itemCard}>
+                <View style={styles.inputGroup}>
+                    <Text
+                        style={[
+                            styles.inputLabel,
+                            styles.textLightTheme,
+                            { fontSize: 14 },
+                        ]}
+                    >
+                        Item Name
+                    </Text>
+                    <TextInput
+                        style={[styles.cardInputReg, styles.textLightTheme]}
+                        value={name}
+                        placeholder="Item Name"
+                        onChangeText={(text) => changeValue(id, text, "name")}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        readOnly
+                    />
+                </View>
+                <View style={styles.dualInputGroup}>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[
+                                styles.inputLabel,
+                                styles.textLightTheme,
+                                { fontSize: 14 },
+                            ]}
+                        >
+                            Expected Quantity
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.cardInputReg,
+                                styles.textInputHalf,
+                                { backgroundColor: "#FFF" },
+                            ]}
+                            value={expected_quantity.toString()}
+                            onChangeText={(text) => {
+                                changeValue(id, text, "expected_quantity");
+                            }}
+                            keyboardType="number-pad"
+                            readOnly
+                        />
+                    </View>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[
+                                styles.inputLabel,
+                                styles.textLightTheme,
+                                { fontSize: 14 },
+                            ]}
+                        >
+                            Actual Quantity
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.cardInputReg,
+                                styles.textInputHalf,
+                                { backgroundColor: "#FFF", width: 126 },
+                            ]}
+                            value={actual_quantity.toString()}
+                            onChangeText={(text) => {
+                                changeValue(id, text, "actual_quantity");
+                            }}
+                            keyboardType="number-pad"
+                            readOnly={!start}
+                        />
+                    </View>
+                </View>
+                <View style={styles.dualInputGroup}>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[
+                                styles.inputLabel,
+                                styles.textLightTheme,
+                                { fontSize: 14 },
+                            ]}
+                        >
+                            Price
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.cardInputReg,
+                                styles.textInputHalf,
+                                { backgroundColor: "#FFF", width: 126 },
+                            ]}
+                            value={price.toString()}
+                            onChangeText={(text) => {
+                                changeValue(id, text, "price");
+                            }}
+                            keyboardType="number-pad"
+                            readOnly={!start}
+                        />
+                    </View>
+                    <View style={styles.inputGroup}>
+                        <Text
+                            style={[
+                                styles.inputLabel,
+                                styles.textLightTheme,
+                                { fontSize: 14 },
+                            ]}
+                        >
+                            Total
+                        </Text>
+                        <TextInput
+                            style={[
+                                styles.cardInputReg,
+                                styles.textInputHalf,
+                                { backgroundColor: "#FFF" },
+                            ]}
+                            value={total.toString()}
+                            keyboardType="number-pad"
+                            readOnly
+                        />
+                    </View>
+                </View>
             </View>
         );
     },
@@ -587,18 +539,40 @@ const Item = React.memo(
 const styles = StyleSheet.create({
     pageContainer: {
         height: "100%",
-        backgroundColor: "white",
-        justifyContent: "center",
+        backgroundColor: "#F7F7F7",
+        paddingHorizontal: 16,
+        paddingBottom: 16,
         alignItems: "center",
-        paddingTop: 0,
+        gap: 32,
     },
     headContainer: {
-        paddingTop: 30,
-        paddingHorizontal: 30,
-        borderBottomWidth: 1,
-        borderBottomColor: "lightgray",
-        width: "100%",
-        gap: 20,
+        gap: 8,
+        height: "auto",
+    },
+    textInput: {
+        padding: 20,
+        width: 336,
+        height: 57,
+        zIndex: 1,
+        backgroundColor: "#EAEAEA",
+        borderRadius: 15,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    textInputHalf: {
+        padding: 20,
+        width: 146,
+        height: 57,
+        zIndex: 1,
+        backgroundColor: "#EAEAEA",
+        borderRadius: 15,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    inputLabel: {
+        marginLeft: 12,
+    },
+    dualInputGroup: {
+        flexDirection: "row",
+        justifyContent: "space-between",
     },
     bodyContainer: {
         position: "relative",
@@ -607,48 +581,55 @@ const styles = StyleSheet.create({
         width: "100%",
         flex: 1,
     },
-    textInput: {
-        borderWidth: 4,
-        paddingVertical: 5,
-        paddingHorizontal: 5,
-        height: 40,
-        zIndex: 1,
-        backgroundColor: "white",
+    textLightTheme: {
+        color: "#1A1A1A",
     },
-    inputShadow: {
-        height: 40,
+    primaryBtn: {
+        borderRadius: 15,
+        display: "flex",
+        justifyContent: "center",
+        alignContent: "center",
+        backgroundColor: "#CC5500",
+        flexDirection: "row",
+        width: 336,
+        height: 57,
+        padding: 16,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    btnFont: {
+        fontSize: 18,
+        color: "#FFF",
+    },
+    listContainer: {
+        flex: 1,
+        overflow: "visible",
+        paddingBottom: 67,
+        position: "relative",
+    },
+    itemCard: {
+        width: 336,
+        borderRadius: 16,
+        boxShadow: "0 4px 4px lightgray",
+        padding: 20,
+        backgroundColor: "#EAEAEA",
+        position: "relative",
+        gap: 16,
+        marginBottom: 20,
+    },
+    cardInputReg: {
+        padding: 20,
+        width: 285,
+        height: 57,
+        zIndex: 1,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 15,
+        boxShadow: "0 4px 4px lightgray",
+    },
+    createBtn: {
         position: "absolute",
-        top: 6,
-        left: 6,
-        borderWidth: 2,
-        width: "100%",
-        backgroundColor: "black",
-        zIndex: -1,
+        bottom: 0,
     },
     inputGroup: {
-        flexDirection: "row",
-        width: "100%",
-        gap: 10,
-        marginBottom: 34,
-    },
-    primaryButton: {
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        width: "100%",
-        borderRadius: 10,
-        backgroundColor: "black",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    secondaryButton: {
-        // paddingVertical: 10,
-        // paddingHorizontal: 20,
-        height: 40,
-        backgroundColor: "#24a0ed",
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: 4,
-        borderRadius: 10,
-        width: "100%",
+        gap: 2,
     },
 });
