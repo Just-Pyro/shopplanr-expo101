@@ -162,7 +162,15 @@ export default function create() {
 
                 if (result) {
                     const netState = await NetInfo.fetch();
-                    if (netState.isConnected) {
+
+                    const usersync =
+                        await AsyncStorage.getItem("user-autosync");
+                    let autosync = true;
+                    if (usersync) {
+                        autosync = JSON.parse(usersync);
+                    }
+
+                    if (netState.isConnected && autosync) {
                         await runSync();
                     }
 

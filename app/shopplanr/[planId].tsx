@@ -225,7 +225,13 @@ export default function updateProduct() {
                 setSwitchButton(true);
 
                 const netState = await NetInfo.fetch();
-                if (netState.isConnected) {
+                const usersync = await AsyncStorage.getItem("user-autosync");
+                let autosync = true;
+                if (usersync) {
+                    autosync = JSON.parse(usersync);
+                }
+
+                if (netState.isConnected && autosync) {
                     runSync();
                 }
             } else if (result === false) {
@@ -260,7 +266,13 @@ export default function updateProduct() {
                 setStart(false);
 
                 const netState = await NetInfo.fetch();
-                if (netState.isConnected) {
+                const usersync = await AsyncStorage.getItem("user-autosync");
+                let autosync = true;
+                if (usersync) {
+                    autosync = JSON.parse(usersync);
+                }
+
+                if (netState.isConnected && autosync) {
                     runSync();
                 }
             }

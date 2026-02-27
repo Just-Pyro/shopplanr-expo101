@@ -6,9 +6,11 @@ import {
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 
+import { AppProvider } from "@/context/AppContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { initDB } from "@/services/database/database";
 import { runSync } from "@/services/sync/SyncService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { useEffect } from "react";
 
@@ -22,10 +24,24 @@ export default function RootLayout() {
             await initDB();
         })();
 
-        runSync();
+        (async () => {
+            const usersync = await AsyncStorage.getItem("user-autosync");
+            let autosync = true;
+            if (usersync) {
+                autosync = JSON.parse(usersync);
+            }
 
-        const unsub = NetInfo.addEventListener((state) => {
-            if (state.isConnected) {
+            if (autosync) runSync();
+        })();
+
+        const unsub = NetInfo.addEventListener(async (state) => {
+            const usersync = await AsyncStorage.getItem("user-autosync");
+            let autosync = true;
+            if (usersync) {
+                autosync = JSON.parse(usersync);
+            }
+
+            if (state.isConnected && autosync) {
                 runSync();
             }
         });
@@ -36,70 +52,72 @@ export default function RootLayout() {
     const colorScheme = useColorScheme();
 
     return (
-        <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-            <Stack>
-                <Stack.Screen
-                    name="index"
-                    options={{
-                        headerShown: false,
-                        presentation: "card",
-                        animation: "none",
-                    }}
-                />
-                <Stack.Screen
-                    name="register"
-                    options={{
-                        headerShown: false,
-                        presentation: "card",
-                        animation: "none",
-                    }}
-                />
-                <Stack.Screen
-                    name="(tabs)"
-                    options={{
-                        headerShown: false,
-                        animation: "none",
-                    }}
-                />
-                <Stack.Screen
-                    name="modal"
-                    options={{ presentation: "modal", title: "Modal" }}
-                />
-                <Stack.Screen
-                    name="shopplanr/create"
-                    options={{
-                        headerShown: true,
-                        headerStyle: {
-                            backgroundColor: "#fff",
-                        },
-                        headerTintColor: "black",
-                        headerTitleStyle: {
-                            color: "black",
-                        },
-                        presentation: "modal",
-                        title: "Create Plan",
-                    }}
-                />
+        <AppProvider>
+            <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+            >
+                <Stack>
+                    <Stack.Screen
+                        name="index"
+                        options={{
+                            headerShown: false,
+                            presentation: "card",
+                            animation: "none",
+                        }}
+                    />
+                    <Stack.Screen
+                        name="register"
+                        options={{
+                            headerShown: false,
+                            presentation: "card",
+                            animation: "none",
+                        }}
+                    />
+                    <Stack.Screen
+                        name="(tabs)"
+                        options={{
+                            headerShown: false,
+                            animation: "none",
+                        }}
+                    />
+                    <Stack.Screen
+                        name="modal"
+                        options={{ presentation: "modal", title: "Modal" }}
+                    />
+                    <Stack.Screen
+                        name="shopplanr/create"
+                        options={{
+                            headerShown: true,
+                            headerStyle: {
+                                backgroundColor: "#fff",
+                            },
+                            headerTintColor: "black",
+                            headerTitleStyle: {
+                                color: "black",
+                            },
+                            presentation: "modal",
+                            title: "Create Plan",
+                        }}
+                    />
 
-                <Stack.Screen
-                    name="shopplanr/[planId]"
-                    options={{
-                        headerShown: true,
-                        headerStyle: {
-                            backgroundColor: "#fff",
-                        },
-                        headerTintColor: "black",
-                        headerTitleStyle: {
-                            color: "black",
-                        },
-                        presentation: "modal",
-                        title: "Shop Plan Item List",
-                    }}
-                />
-            </Stack>
-            {/* <StatusBar style="auto" /> */}
-        </ThemeProvider>
+                    <Stack.Screen
+                        name="shopplanr/[planId]"
+                        options={{
+                            headerShown: true,
+                            headerStyle: {
+                                backgroundColor: "#fff",
+                            },
+                            headerTintColor: "black",
+                            headerTitleStyle: {
+                                color: "black",
+                            },
+                            presentation: "modal",
+                            title: "Shop Plan",
+                        }}
+                    />
+                </Stack>
+                {/* <StatusBar style="auto" /> */}
+            </ThemeProvider>
+        </AppProvider>
     );
 }

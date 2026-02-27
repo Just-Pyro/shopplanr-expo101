@@ -43,9 +43,16 @@ export default function list() {
             if (authUser) {
                 const user = JSON.parse(authUser);
                 // const checkUp = await checkUpdates(user.id);
+
+                // check autosync local storage and apply as additional condition for running sync function
+                const usersync = await AsyncStorage.getItem("user-autosync");
+                let autosync = true;
+                if (usersync) {
+                    autosync = JSON.parse(usersync);
+                }
                 // console.log("checkUp:", checkUp);
                 const netState = await NetInfo.fetch();
-                if (netState.isConnected) {
+                if (netState.isConnected && autosync) {
                     await runSync();
                 }
 
