@@ -103,6 +103,7 @@ shopplanr-expo/
 
 - [ShopPlanr — React Web](https://github.com/Just-Pyro/ShopPlanr-web)
 - [ShopPlanr — Laravel Blade](https://github.com/Just-Pyro/Shopplanr)
+- [ShopPlanr — React Web(TS)](https://github.com/Just-Pyro/ShopPlanr-ts)
 
 ---
 
